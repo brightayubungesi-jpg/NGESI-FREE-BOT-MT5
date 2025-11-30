@@ -1,0 +1,169 @@
+//+------------------------------------------------------------------+
+//|   Scalping Bot With Zone Detection + Touch Entry + Early Close  |
+//|   Works on XAUUSD, EURUSD, AUDUSD, USDCHF, V75(1s)               |
+//+------------------------------------------------------------------+
+#property strict
+#include <Trade/Trade.mqh>
+CTrade trade;
+
+//---------------- INPUTS ----------------
+input double Lots = 0.01;
+input int TouchSL_Pips = 30;      // SL ya zone touch
+input int EarlyClosePips = 3;     // Early close pips
+
+//---------------- GLOBAL VARIABLES ----------------
+double SupportLevel = 0.0;
+double ResistanceLevel = 0.0;
+int WinCounter = 0;          // <= ADDED
+double CurrentLots = 0.0;    // <= ADDED
+
+//------------------------------------------------------------------
+//| INIT: set current lots                                          |
+//------------------------------------------------------------------
+int OnInit()
+{
+   CurrentLots = Lots;
+   return(INIT_SUCCEEDED);
+}
+
+//------------------------------------------------------------------
+//| DETECT SUPPORT & RESISTANCE FROM LAST 3 CANDLES                 |
+//------------------------------------------------------------------
+void DetectZones(string symbol)
+{
+   double h1 = iHigh(symbol, 0, 1);
+   double h2 = iHigh(symbol, 0, 2);
+   double h3 = iHigh(symbol, 0, 3);
+
+   double l1 = iLow(symbol, 0, 1);
+   double l2 = iLow(symbol, 0, 2);
+   double l3 = iLow(symbol, 0, 3);
+
+   ResistanceLevel = MathMax(h1, MathMax(h2, h3));
+   SupportLevel    = MathMin(l1, MathMin(l2, l3));
+}
+
+//------------------------------------------------------------------
+//| STOPLOSS AUTOMATIC PER SYMBOL                                   |
+//------------------------------------------------------------------
+double GetSymbolSL(string symbol)
+{
+   if (symbol == "XAUUSD")
+      return 153;
+
+   if (symbol == "Volatility 75 (1s) Index" || symbol == "V75" || symbol == "V75sec")
+      return 730;
+
+   return 100; // forex default
+}
+
+//------------------------------------------------------------------
+//| AUTO ADJUST LOT SIZE AFTER 10 WINS                              |
+//------------------------------------------------------------------
+void CheckWinIncrease()
+{
+   HistorySelect(0, TimeCurrent());
+
+   int totalHistory = HistoryDealsTotal();
+
+   for(int i = totalHistory - 1; i >= 0; i--)
+   {
+      ulong ticket = HistoryDealGetTicket(i);
+
+      if (HistoryDealGetInteger(ticket, DEAL_ENTRY) == DEAL_ENTRY_OUT)
+      {
+         double profit = HistoryDealGetDouble(ticket, DEAL_PROFIT);
+
+         if (profit > 0)
+         {
+            WinCounter++;
+
+            if (WinCounter >= 10)
+            {
+               CurrentLots *= 2.0;   // <= DOUBLE LOT SIZE
+               WinCounter = 0;       // reset
+               Print("Lots increased automatically to: ", CurrentLots);
+            }
+         }
+         break;
+      }
+   }
+}
+
+//------------------------------------------------------------------
+//| ENTRY ON TOUCH OF ZONE                                          |
+//------------------------------------------------------------------
+void ZoneTouchEntry(string symbol)
+{
+   double ask   = SymbolInfoDouble(symbol, SYMBOL_ASK);
+   double bid   = SymbolInfoDouble(symbol, SYMBOL_BID);
+   double point = SymbolInfoDouble(symbol, SYMBOL_POINT);
+
+   double slPoints = GetSymbolSL(symbol) * point;
+
+   // ---------------- SELL TOUCH RESISTANCE ----------------
+   if (ask >= ResistanceLevel)
+   {
+      double sl = ask + slPoints;
+      if (trade.Sell(CurrentLots, symbol, bid, sl))
+         Print(symbol, " SELL on resistance touch");
+   }
+
+   // ---------------- BUY TOUCH SUPPORT ----------------
+   if (bid <= SupportLevel)
+   {
+      double sl = bid - slPoints;
+      if (trade.Buy(CurrentLots, symbol, ask, sl))
+         Print(symbol, " BUY on support touch");
+   }
+}
+
+//------------------------------------------------------------------
+//| EARLY CLOSE +3 PIPS PROFIT                                      |
+//------------------------------------------------------------------
+void EarlyClose(string symbol)
+{
+   if (!PositionSelect(symbol)) return;
+
+   long type         = PositionGetInteger(POSITION_TYPE);
+   double entry      = PositionGetDouble(POSITION_PRICE_OPEN);
+   double point      = SymbolInfoDouble(symbol, SYMBOL_POINT);
+   double currentBid = SymbolInfoDouble(symbol, SYMBOL_BID);
+   double currentAsk = SymbolInfoDouble(symbol, SYMBOL_ASK);
+
+   double target = EarlyClosePips * point;
+
+   // BUY PROFIT CHECK
+   if (type == POSITION_TYPE_BUY)
+   {
+      if ((currentBid - entry) >= target)
+      {
+         trade.PositionClose(symbol);
+         Print(symbol, " BUY closed early (+3 pips)");
+      }
+   }
+
+   // SELL PROFIT CHECK
+   if (type == POSITION_TYPE_SELL)
+   {
+      if ((entry - currentAsk) >= target)
+      {
+         trade.PositionClose(symbol);
+         Print(symbol, " SELL closed early (+3 pips)");
+      }
+   }
+}
+
+//------------------------------------------------------------------
+//| ON TICK                                                         |
+//------------------------------------------------------------------
+void OnTick()
+{
+   string sym = Symbol();
+
+   DetectZones(sym);
+   CheckWinIncrease();
+   ZoneTouchEntry(sym);
+   EarlyClose(sym);
+}
+//+------------------------------------------------------------------+
