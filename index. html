@@ -3,40 +3,118 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NGESI BOT B2 - Home</title>
+    <title>NGESI ROBOTICS | FREE MT5 BOT</title>
+
     <style>
-        body { font-family: Arial, sans-serif; margin: 0; padding: 0; background: #f4f4f4; }
-        header { background: #000; color: white; padding: 15px; text-align: center; }
-        nav { background: #111; padding: 10px; text-align: center; }
-        nav a { color: white; margin: 0 15px; text-decoration: none; font-weight: bold; }
-        nav a:hover { color: #00ff99; }
-        .container { padding: 20px; text-align: center; }
-        .btn { background: #000; color: white; padding: 10px 20px; margin-top: 20px; text-decoration: none; display: inline-block; }
-        .btn:hover { background: #333; }
+        body {
+            margin: 0;
+            background: #0d0d0d;
+            font-family: Arial, sans-serif;
+            color: white;
+        }
+
+        header {
+            background: #111;
+            padding: 20px;
+            text-align: center;
+            font-size: 25px;
+            font-weight: bold;
+            letter-spacing: 2px;
+            color: #00eaff;
+            border-bottom: 2px solid #00eaff;
+        }
+
+        nav {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            padding: 15px;
+            background: #0f0f0f;
+            border-bottom: 1px solid #1a1a1a;
+        }
+
+        nav a {
+            color: #00eaff;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        nav a:hover {
+            color: white;
+        }
+
+        .container {
+            padding: 25px;
+            text-align: center;
+        }
+
+        h1 {
+            color: #00eaff;
+            font-size: 30px;
+        }
+
+        p {
+            color: #ccc;
+            font-size: 17px;
+        }
+
+        .button {
+            background: #00eaff;
+            color: black;
+            padding: 12px 25px;
+            font-size: 18px;
+            text-decoration: none;
+            display: inline-block;
+            border-radius: 5px;
+            margin-top: 15px;
+            font-weight: bold;
+        }
+
+        .button:hover {
+            background: white;
+        }
+
+        footer {
+            background: #111;
+            text-align: center;
+            padding: 15px;
+            color: #666;
+            margin-top: 40px;
+            border-top: 1px solid #1a1a1a;
+        }
     </style>
 </head>
 <body>
 
-<header>
-    <h1>NGESI BOT B2</h1>
-    <p>Welcome to the official download & support page</p>
-</header>
+    <header>
+        NGESI ROBOTICS
+    </header>
 
-<nav>
-    <a href="index.html">Home</a>
-    <a href="about.html">About</a>
-    <a href="download.html">Download</a>
-    <a href="contact.html">Contact</a>
-    <a href="feedback.html">Feedback</a>
-    <a href="disclaimer.html">Disclaimer</a>
-</nav>
+    <nav>
+        <a href="#">Home</a>
+        <a href="#">About</a>
+        <a href="#">Download</a>
+        <a href="#">Contact</a>
+        <a href="#">Disclaimer</a>
+        <a href="#">Feedback</a>
+    </nav>
 
-<div class="container">
-    <h2>Welcome to NGESI BOT B2</h2>
-    <p>This is the official page for downloading, updates and support for NGESI ROBOTICS projects.</p>
+    <div class="container">
+        <h1>Welcome to NGESI FREE MT5 BOT</h1>
+        <p>Download free MT5 trading bots for XAUUSD, EURUSD, AUDUSD, USDCHF & V75.  
+        Fast | Safe | Easy | Free Updates.</p>
 
-    <a href="download.html" class="btn">Download Bot</a>
-</div>
+        <a class="button" href="#">Download Now</a>
+
+        <h2 style="color:#00eaff; margin-top:40px;">Contact Us</h2>
+        <a class="button" href="https://wa.me/255xxxxxxxxx">WhatsApp</a>
+        <a class="button" href="tel:+255xxxxxxxxx">Call</a>
+    </div>
+
+    <footer>
+        © 2025 NGESI ROBOTICS — All Rights Reserved.
+    </footer>
 
 </body>
 </html>
